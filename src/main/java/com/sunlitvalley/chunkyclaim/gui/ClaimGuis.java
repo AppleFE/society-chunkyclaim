@@ -1,6 +1,5 @@
 package com.sunlitvalley.chunkyclaim.gui;
 
-import com.mojang.authlib.GameProfile;
 import com.sunlitvalley.chunkyclaim.data.Claim;
 import com.sunlitvalley.chunkyclaim.data.ClaimBounds;
 import com.sunlitvalley.chunkyclaim.service.ClaimService;
@@ -166,8 +165,10 @@ public final class ClaimGuis {
                                 clicker.closeContainer();
                                 send(clicker, ClaimService.teleportToClaim(clicker, selected, true));
                             } else if (slot == 45 && page > 0) {
+                                clicker.closeContainer();
                                 openAdminList(clicker, page - 1);
                             } else if (slot == 53 && page < maxPage) {
+                                clicker.closeContainer();
                                 openAdminList(clicker, page + 1);
                             }
                         }

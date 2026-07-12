@@ -308,6 +308,14 @@ public final class ProtectionEvents {
         return player != null && (ClaimService.isOperator(player) || claim.get().canAccess(player.getUUID()));
     }
 
+    public static boolean allowModAction(ServerPlayer player, Level level, BlockPos position) {
+        boolean allowed = mayModify(player, level, position);
+        if (!allowed) {
+            deny(player);
+        }
+        return allowed;
+    }
+
     private static Optional<UUID> ownerAt(Level level, BlockPos position) {
         return ClaimService.claimAt(level, position).map(Claim::ownerId);
     }
