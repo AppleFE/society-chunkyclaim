@@ -74,4 +74,3 @@ public abstract class BuildingGadgetsTickMixin {
         return type.getField(name);
     }
 }
-
