@@ -77,6 +77,16 @@ public final class ClaimService {
         return data(level.getServer()).at(level.dimension(), position);
     }
 
+    public static Optional<Claim> ownedClaim(ServerPlayer player) {
+        return data(player.getServer()).byOwner(player.getUUID());
+    }
+
+    public static boolean ownsPosition(ServerPlayer player, Level level, BlockPos position) {
+        return ownedClaim(player)
+                .map(claim -> claim.bounds().contains(level.dimension(), position))
+                .orElse(false);
+    }
+
     public static boolean isOperator(ServerPlayer player) {
         return player.getServer().getPlayerList().isOp(player.getGameProfile());
     }
@@ -333,4 +343,3 @@ public final class ClaimService {
         }
     }
 }
-

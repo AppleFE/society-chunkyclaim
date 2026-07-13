@@ -1,6 +1,6 @@
 package com.sunlitvalley.chunkyclaim.mixin.compat;
 
-import com.sunlitvalley.chunkyclaim.event.ProtectionEvents;
+import com.sunlitvalley.chunkyclaim.service.ClaimService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,7 +29,7 @@ public abstract class PortableBlueprintPlaceMixin {
 
     @Inject(method = "placeNow", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void societyChunkyClaim$checkTarget(CallbackInfo callback) {
-        if (!ProtectionEvents.allowModAction(player, serverLevel, blockPos)) {
+        if (!ClaimService.ownsPosition(player, serverLevel, blockPos)) {
             callback.cancel();
         }
     }
