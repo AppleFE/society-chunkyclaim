@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -211,6 +212,27 @@ public final class ClaimService {
         clearInvitesFor(ownerId);
         removed.get().members().keySet().forEach(INVITES::remove);
         return ActionResult.success(ownerName + "님의 사유지를 철거했습니다.");
+    }
+
+    public static ActionResult demolishByStoredOwnerName(MinecraftServer server, String ownerName) {
+        ClaimSavedData data = data(server);
+        List<Claim> matches = data.byOwnerName(ownerName);
+        if (matches.isEmpty()) {
+            return ActionResult.failure("저장된 소유자명이 " + ownerName + "인 사유지가 없습니다.");
+        }
+        if (matches.size() > 1) {
+            return ActionResult.failure("저장된 소유자명이 " + ownerName + "인 사유지가 "
+                    + matches.size() + "개라 안전하게 철거할 수 없습니다.");
+        }
+
+        Claim claim = matches.get(0);
+        Optional<Claim> removed = data.removeByOwner(claim.ownerId());
+        if (removed.isEmpty()) {
+            return ActionResult.failure(ownerName + "님의 사유지를 철거하지 못했습니다.");
+        }
+        clearInvitesFor(claim.ownerId());
+        claim.members().keySet().forEach(INVITES::remove);
+        return ActionResult.success(ownerName + "님의 사유지를 저장된 소유자명으로 철거했습니다.");
     }
 
     public static ActionResult setHome(ServerPlayer owner) {

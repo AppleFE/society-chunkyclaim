@@ -50,6 +50,12 @@ public final class ClaimSavedData extends SavedData {
         return claims.stream().filter(claim -> claim.ownerId().equals(ownerId)).findFirst();
     }
 
+    public List<Claim> byOwnerName(String ownerName) {
+        return claims.stream()
+                .filter(claim -> claim.ownerName().equalsIgnoreCase(ownerName))
+                .toList();
+    }
+
     public Optional<Claim> byMember(UUID memberId) {
         return claims.stream().filter(claim -> claim.isMember(memberId)).findFirst();
     }

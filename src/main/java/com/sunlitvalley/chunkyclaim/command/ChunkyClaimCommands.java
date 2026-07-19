@@ -2,6 +2,7 @@ package com.sunlitvalley.chunkyclaim.command;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -33,6 +34,7 @@ public final class ChunkyClaimCommands {
     private static final String PLAYER = "닉네임";
     private static final String OWNER = "소유자";
     private static final String MEMBER = "구성원";
+    private static final String STORED_OWNER_NAME = "저장된소유자명";
     private static final SimpleCommandExceptionType ONE_PROFILE = new SimpleCommandExceptionType(
             Component.literal("플레이어 한 명만 지정해야 합니다.")
     );
@@ -62,6 +64,9 @@ public final class ChunkyClaimCommands {
                 .then(Commands.literal("철거")
                         .then(Commands.argument(PLAYER, GameProfileArgument.gameProfile())
                                 .executes(ChunkyClaimCommands::demolish)))
+                .then(Commands.literal("이름철거")
+                        .then(Commands.argument(STORED_OWNER_NAME, StringArgumentType.word())
+                                .executes(ChunkyClaimCommands::demolishByStoredOwnerName)))
                 .then(Commands.literal("강제초대")
                         .then(Commands.argument(OWNER, GameProfileArgument.gameProfile())
                                 .then(Commands.argument(MEMBER, GameProfileArgument.gameProfile())
@@ -152,6 +157,13 @@ public final class ChunkyClaimCommands {
         GameProfile owner = oneProfile(context, PLAYER);
         return send(context.getSource(), ClaimService.demolish(
                 context.getSource().getServer(), owner.getId(), owner.getName()
+        ), true);
+    }
+
+    private static int demolishByStoredOwnerName(CommandContext<CommandSourceStack> context) {
+        String ownerName = StringArgumentType.getString(context, STORED_OWNER_NAME);
+        return send(context.getSource(), ClaimService.demolishByStoredOwnerName(
+                context.getSource().getServer(), ownerName
         ), true);
     }
 
