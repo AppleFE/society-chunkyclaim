@@ -33,6 +33,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.PistonEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -227,8 +228,12 @@ public final class ProtectionEvents {
     public static void onMobGriefing(EntityMobGriefingEvent event) {
         Entity entity = event.getEntity();
         if (ClaimService.claimAt(entity.level(), entity.blockPosition()).isPresent()) {
-            event.setCanceled(true);
+            denyMobGriefing(event);
         }
+    }
+
+    static void denyMobGriefing(EntityMobGriefingEvent event) {
+        event.setResult(Event.Result.DENY);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
