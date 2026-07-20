@@ -3,6 +3,7 @@ package com.sunlitvalley.chunkyclaim.event;
 import com.sunlitvalley.chunkyclaim.SocietyChunkyClaimMod;
 import com.sunlitvalley.chunkyclaim.config.ChunkyClaimConfig;
 import com.sunlitvalley.chunkyclaim.service.ClaimService;
+import com.sunlitvalley.chunkyclaim.service.ClaimBoundaryVisualizer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -39,6 +40,7 @@ public final class TicketEvents {
         ClaimService.CreateResult result = ClaimService.createClaim(player);
         if (result.success()) {
             held.shrink(1);
+            ClaimBoundaryVisualizer.onClaimCreated(player);
             player.sendSystemMessage(Component.literal(result.message()));
         } else {
             player.sendSystemMessage(Component.literal(result.message()));

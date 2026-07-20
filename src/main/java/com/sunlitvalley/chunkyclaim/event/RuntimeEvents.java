@@ -3,10 +3,12 @@ package com.sunlitvalley.chunkyclaim.event;
 import com.sunlitvalley.chunkyclaim.SocietyChunkyClaimMod;
 import com.sunlitvalley.chunkyclaim.config.ChunkyClaimConfig;
 import com.sunlitvalley.chunkyclaim.service.ClaimService;
+import com.sunlitvalley.chunkyclaim.service.ClaimBoundaryVisualizer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -14,6 +16,10 @@ import java.io.IOException;
 
 @Mod.EventBusSubscriber(modid = SocietyChunkyClaimMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class RuntimeEvents {
+    private static final int VISUALIZER_TICK_INTERVAL = 20;
+
+    private static int visualizerTick;
+
     private RuntimeEvents() {
     }
 
@@ -35,7 +41,26 @@ public final class RuntimeEvents {
     }
 
     @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ClaimBoundaryVisualizer.clearPlayer(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END
+                || ++visualizerTick % VISUALIZER_TICK_INTERVAL != 0) {
+            return;
+        }
+        for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
+            ClaimBoundaryVisualizer.tick(player);
+        }
+    }
+    @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
+        ClaimBoundaryVisualizer.clear();
+        visualizerTick = 0;
         ClaimService.clearRuntimeState();
     }
 }

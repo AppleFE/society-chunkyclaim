@@ -11,6 +11,7 @@ import com.sunlitvalley.chunkyclaim.config.ChunkyClaimConfig;
 import com.sunlitvalley.chunkyclaim.data.Claim;
 import com.sunlitvalley.chunkyclaim.data.ClaimSavedData;
 import com.sunlitvalley.chunkyclaim.gui.ClaimGuis;
+import com.sunlitvalley.chunkyclaim.service.ClaimBoundaryVisualizer;
 import com.sunlitvalley.chunkyclaim.service.ClaimService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -86,6 +87,7 @@ public final class ChunkyClaimCommands {
                 .then(Commands.literal("추방")
                         .then(Commands.argument(PLAYER, GameProfileArgument.gameProfile())
                                 .executes(ChunkyClaimCommands::kick)))
+                .then(Commands.literal("구역보기").executes(ChunkyClaimCommands::toggleClaimBoundary))
                 .then(Commands.literal("홈설정").executes(ChunkyClaimCommands::setHome))
                 .then(Commands.literal("홈").executes(ChunkyClaimCommands::home))
         );
@@ -195,6 +197,7 @@ public final class ChunkyClaimCommands {
         source.sendSuccess(() -> Component.literal("/사유지 추방 <닉네임> - 내 사유지 구성원 추방"), false);
         source.sendSuccess(() -> Component.literal("/사유지 홈설정 - 현재 위치를 홈으로 설정"), false);
         source.sendSuccess(() -> Component.literal("/사유지 홈 - 사유지 홈으로 이동"), false);
+        source.sendSuccess(() -> Component.literal("/사유지 구역보기 - 소속 사유지 경계 표시 켜기/끄기"), false);
         return 1;
     }
 
@@ -239,6 +242,14 @@ public final class ChunkyClaimCommands {
         ), false);
     }
 
+    private static int toggleClaimBoundary(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        ClaimBoundaryVisualizer.ToggleResult result = ClaimBoundaryVisualizer.toggle(player);
+        if (!result.success()) {
+            return fail(context.getSource(), result.message());
+        }
+        return success(context.getSource(), result.message(), false);
+    }
     private static int setHome(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer owner = context.getSource().getPlayerOrException();
         if (ClaimService.data(owner.getServer()).forPlayer(owner.getUUID()).isEmpty()) {
